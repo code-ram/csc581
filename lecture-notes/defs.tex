@@ -1,0 +1,86 @@
+% definitions for slides for CSC544
+% Lutz Hamel, (c) 2007
+
+\hypersetup{pdfpagemode=FullScreen}
+
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{alltt}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsopn}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage[usenames]{color}
+
+\def\sign{\qopname\relax{no}{sign}}
+\def\argmax{\qopname\relax{no}{argmax}}
+\def\argmin{\qopname\relax{no}{argmin}}
+
+\newcommand{\grad}{\ensuremath{\nabla}} 
+\newcommand{\loss}{\ensuremath{{\cal L}}}
+\newcommand{\err}{\mbox{err}}
+\newcommand{\mse}{\mbox{mse}}
+\newcommand{\acc}{\mbox{acc}}
+\newcommand{\Integer}{\ensuremath{\mathbb{N}}}
+\newcommand{\size}[1]{{|{#1}|}}
+\newcommand{\Rnspace}[1]{\ensuremath{\mathbb{R}^{#1}}}
+\newcommand{\Real}{\ensuremath{\mathbb{R}}}
+\newcommand{\mytt}[1]{{\small\tt{#1}}}
+\newcommand{\textemph}[1]{{\em #1}}
+\newcommand{\suchthat}{\mid}
+\newcommand{\orbar}{\;|\;}
+\newcommand{\bs}[1]{\begin{slide}{#1}\ptsize{8}}
+\newcommand{\es}{\end{slide}}
+\newcommand{\co}{\,\colon\;}
+\newcommand{\pair}[2]{\ensuremath{( {#1}, {#2} )}}
+\newcommand{\model}[1]{\hat{#1}}
+\newcommand{\ul}[1]{{\bf\em #1}}
+\newcommand{\ol}{\overline}
+\newcommand{\definition}[1]{{\bf Definition: }{\em #1}}
+\newcommand{\example}[1]{{\bf Example: }{#1}}
+\newcommand{\abs}[1]{|{#1}|}
+\newcommand{\mytab}{\makebox[.1in]{}}
+
+\newcommand{\fdef}[1]{
+\begin{center}
+\fbox{
+\begin{minipage}{3.5in}
+{\bf Definition:}
+{#1}
+\end{minipage}
+}
+\end{center}
+}
+
+\newcommand{\fframe}[1]{
+\begin{center}
+\fbox{
+\begin{minipage}{3.5in}
+{#1}
+\end{minipage}
+}
+\end{center}
+}
+
+\newcommand{\nframe}[1]{
+\begin{center}
+\begin{minipage}{3.5in}
+{#1}
+\end{minipage}
+\end{center}
+}
+
+\newenvironment{Rcode}
+	{
+		\scriptsize
+		\begin{quote}
+		\begin{alltt}
+	}
+	{
+		\end{alltt}
+		\end{quote}
+	}
+
+
+

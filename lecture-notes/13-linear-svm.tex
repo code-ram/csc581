@@ -1,0 +1,114 @@
+%template1.tex
+%The following LaTeX source file represents the simplest kind of slide presentation; no overlays, no included graphics. Substitute your favorite style for ``pascal''. To create the PDF file template1.pdf, (1) be sure to use the prosper class, then (2) execute the command latex template1.tex, and (3) the command dvipdf template1.dvi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,blends,pdf,colorBG,slideColor]{prosper}
+\include{defs}
+\begin{document}
+
+\bs{\large Dual Maximum Margin Optimization}
+\fframe{{\bf Proposition:}
+(The Maximum Margin Lagrangian Dual)
+Given the primal maximum margin optimization, \footnote{See lecture notes on maximum margin
+classifiers.}
+then the Lagrangian dual optimization for maximum margin classifiers is
+\begin{equation*}
+\max_{\ol{\alpha}} \phi'(\ol{\alpha}) = 
+  \max_{\ol{\alpha}} \left ( \sum_{i=1}^l \alpha_i - 
+  \frac{1}{2}\sum_{i=1}^l \sum_{j=1}^l \alpha_i \alpha_j y_i y_j \ol{x}_i \bullet \ol{x}_j \right ),
+\end{equation*}
+subject to the constraints
+\begin{align*}
+\sum_{i=1}^l \alpha_i  y_i &= 0,\\
+\alpha_i  &\ge 0, 
+\end{align*}
+with $i = 1,\ldots,l$.
+}
+\es
+
+
+\bs{The Dual Decision Function}
+We also know that given the optimal Lagrangian multipliers $\ol{\alpha}^*$ we can
+construct both $\ol{w}^*$,
+\begin{equation*}
+\ol{w}^* = \sum_{i=1}^l \alpha^*_i y_i  \ol{x}_i,
+\end{equation*}
+and $b^*$,
+\begin{equation*}
+b^*  = \sum_{i=1}^l \alpha^*_i y_i  \ol{x}_i\bullet\ol{x}_{sv^+} - 1,
+\end{equation*}
+where we pick one support vector from the set of available support vectors,
+\begin{equation*}
+(\ol{x}_{sv^+},+1) \in \{(\ol{x}_i,+1) \mid (\ol{x}_i,+1)\in D \text{ and } \alpha^*_i > 0\},
+\end{equation*}
+The identity for $b^*$ follows directly from the KKT complimentarity condition with $\alpha^*_j > 0$ for some point $(\ol{x}_j,y_j)\in D$, then 
+$y_j(\ol{w}^*\bullet\ol{x}_j-b^*) - 1 = 0$ or,
+\begin{align*}
+\ol{w}^*\bullet\ol{x}_j & = b^* + 1 \quad\text{ if $y_j = +1$},\\
+\ol{w}^*\bullet\ol{x}_j & = b^* - 1 \quad\text{ if $y_j = -1$}.
+\end{align*}
+Plugging in $\ol{w}^*$ and solving for $b^*$ gives us our required result.
+
+
+\es
+
+\bs{The Dual Decision Function}
+Putting this all together gives us,
+\begin{align*}
+\model{f}(\ol{x}) &= \sign (\ol{w}^*\bullet\ol{x} -b^*)\\
+&= \sign \left ( \sum_{i=1}^l \alpha^*_i y_i \ol{x}_i\bullet\ol{x} - \sum_{i=1}^l \alpha^*_i y_i  \ol{x}_i\bullet\ol{x}_{sv^+} + 1\right ).
+\end{align*}
+As we would expect, the dual decision function is completely determined by the
+Lagrangian multipliers $\ol{\alpha}^*$.
+
+Observing that the decision function is completely determined by points $\ol{x}_i$ with
+$\alpha^*_i > 0$, we can say that the dual decision function is completely determined by
+the support vectors.
+
+\begin{center}
+\fbox{We consider the dual decision function a {\em support vector machine}.}
+\end{center}
+
+\es
+
+\bs{Linear SVMs}
+Given
+\begin{itemize}
+\item a dot product space $\Rnspace{n}$ as our data universe with points $\ol{x} \in \Rnspace{n}$,
+\item some target function $f\co \Rnspace{n} \rightarrow \{+1,-1\}$,
+\item a labeled, linearly separable training set, 
+\begin{equation*}
+D = \{(\ol{x}_1,y_1),(\ol{x}_2,y_2),\ldots,(\ol{x}_l,y_l)\} \subseteq \Rnspace{n}\times\{+1, -1\},
+\end{equation*}
+where $y_i = f(\ol{x}_i)$,
+\end{itemize}
+then compute a model  $\model{f}\co \Rnspace{n} \rightarrow \{+1,-1\}$ using $D$ such that,
+\begin{equation*}
+\model{f}(\ol{x}) \cong f(\ol{x}),
+\end{equation*}
+for all $\ol{x} \in \Rnspace{n}$.
+
+\es
+
+\bs{Linear SVMs}
+Here we take as our models the linear support vector machines,
+\begin{equation*}
+\model{f}(\ol{x}) = \sign \left ( \sum_{i=1}^l \alpha^*_i y_i \ol{x}_i\bullet\ol{x} - \sum_{i=1}^l \alpha^*_i y_i  \ol{x}_i\bullet\ol{x}_{sv^+} + 1\right ),
+\end{equation*}
+and we compute our support vector models with the Lagrangian dual optimization for maximum margin classifiers,
+\begin{equation*}
+\ol{\alpha}^* =  
+  \argmax_{\ol{\alpha}} \left ( \sum_{i=1}^l \alpha_i - 
+  \frac{1}{2}\sum_{i=1}^l \sum_{j=1}^l \alpha_i \alpha_j y_i y_j \ol{x}_i \bullet \ol{x}_j \right ),
+\end{equation*}
+subject to the constraints
+\begin{align*}
+\sum_{i=1}^l \alpha_i  y_i &= 0,\\
+\alpha_i  &\ge 0, 
+\end{align*}
+where $i = 1,\ldots,l$.
+\es
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% end of template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

@@ -1,0 +1,330 @@
+%template1.tex
+%The following LaTeX source file represents the simplest kind of slide presentation; no overlays, no included graphics. Substitute your favorite style for ``pascal''. To create the PDF file template1.pdf, (1) be sure to use the prosper class, then (2) execute the command latex template1.tex, and (3) the command dvipdf template1.dvi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,blends,pdf,colorBG,slideColor]{prosper}
+\include{defs}
+\begin{document}
+
+\bs{Optimization Problem}
+\small
+Recall the following setting for training support vector machines.
+
+Assume that we are given the training set,
+\begin{equation*}
+D = \{(\ol{x}_1,y_1),(\ol{x}_2,y_2),\ldots,(\ol{x}_l,y_l)\} \subseteq \Rnspace{n}\times\{+1, -1\}.
+\end{equation*}
+We are interested in computing a classifier in the form of a support vector machine model,
+\begin{equation*}
+\model{f}(\ol{x}) = \sign \left ( \sum_{i=1}^l y_i \alpha^*_i k(\ol{x}_i,\ol{x}) - b^*\right ),
+\end{equation*}
+using a training algorithm based on the Lagrangian dual,
+\begin{equation*}
+\ol{\alpha}^* = {\color{red} \argmax_{\ol{\alpha}} \phi'(\ol{\alpha})} = 
+ \argmax_{\ol{\alpha}}  \left (\sum_{i=1}^l \alpha_i - 
+  \frac{1}{2}\sum_{i=1}^l\sum_{j=1}^l y_i y_j \alpha_i \alpha_j k(\ol{x}_i,\ol{x}_j) \right ),
+\end{equation*}
+subject to  the constraints,
+\begin{align*}
+\sum_{i=1}^l y_i \alpha_i &= 0, \\
+C \ge \alpha_i &\ge 0,  
+\end{align*}
+with $i=1,\ldots,l$.
+\es
+
+\bs{Quadratic Programming}
+We can use quadratic programming to implement support vector machines,
+\begin{gather*}
+\ol{\alpha}^* = \argmin_{\ol{\alpha}} \left (\frac{1}{2} \ol{\alpha}^T {\mathbf Q}\ol{\alpha} - \ol{q}\bullet\ol{\alpha}  \right ),\\
+\intertext{subject to the constraints,}
+{\color{red}{\mathbf Y} \ol{\alpha} = 0},\\
+{\color{red}\ol{u} \le \ol{\alpha} \le \ol{v}}.
+\end{gather*}
+In order to do this we have to use quadratic programming packages
+that support both equality and inequality constraints.
+
+This is different from our use of quadratic programming in the primal 
+maximum margin classifiers - there we only needed to support inequality constraints,
+\begin{equation*}
+\ol{w}^* =  \argmin_{\ol{w}} \left (\frac{1}{2} \ol{w}^T {\mathbf Q}\; \ol{w} - \ol{q}\bullet\ol{w}\right ),
+\end{equation*}
+subject to the constraints
+\begin{equation*}
+{\mathbf X}^T\ol{w} \ge \ol{c}.
+\end{equation*}
+
+\es
+
+\bs{Quadratic Programming}
+\small
+Quadratic solvers are usually defined in terms of minimization, therefore we need to
+massage our support vector optimization problem a little bit,
+\begin{align*}
+\argmax_{\ol{\alpha}}  \phi'(\ol{\alpha}) &= \argmin_{\ol{\alpha}} \left (- \phi'(\ol{\alpha})\right ) \nonumber\\
+\label{eq:lagrangian-dual-impl-min}
+	&= \argmin_{\ol{\alpha}}  
+	 \left (\frac{1}{2}\sum_{i=1}^l\sum_{j=1}^l y_i y_j \alpha_i \alpha_j k(\ol{x}_i,\ol{x}_j) 
+ 		 - \sum_{i=1}^l \alpha_i \right )\\
+	&= \argmin_{\ol{\alpha}} \left (\frac{1}{2} \ol{\alpha}^T {\mathbf Q}\ol{\alpha} - \ol{q}\bullet\ol{\alpha}  \right )
+\end{align*}
+where the matrix $\mathbf Q$ is an $l\times l$ matrix with components 
+\begin{equation*}
+Q_{ij} = y_i y_j {\color{red}k(\ol{x}_i,\ol{x}_j)}
+\end{equation*}
+and the vector $\ol{q}$ has $l$ components initialized to one,
+\begin{equation*}
+\ol{q} = \ol{1}.
+\end{equation*}
+We call the matrix $\mathbf Q$ the {\em kernel matrix}. In effect, when using quadratic programming
+solvers we need to {\em precompute} the dot product between the pairwise training points.
+\es
+
+\bs{Quadratic Programming}
+\small
+The constraints 
+\begin{gather*}
+{\mathbf Y} \ol{\alpha} = 0,\\
+\ol{u} \le \ol{\alpha} \le \ol{v}.
+\end{gather*}
+are easily instantiated. We let $\mathbf Y$ be a $1 \times l$ matrix with components
+\begin{equation*}
+Y_{1i} = y_i,
+\end{equation*}
+where $(\ol{x}_i,y_i) \in D$ then,
+\begin{equation*}
+{\mathbf Y} \ol{\alpha} = \sum_{i = 1}^l y_i \alpha_i.
+\end{equation*}
+Finally, if we let $\ol{u} = \ol{0}$  and  let
+vector $\ol{v}$ be a constant vector with $v_i = C$ then,
+\begin{equation*}
+u_i \le \alpha_i \le v_i,
+\end{equation*}
+which implies
+\begin{equation*}
+0 \le \alpha_i \le C,
+\end{equation*}
+with $i = 1,\ldots,l$.
+
+\es
+
+\bs{Quadratic Programming}
+\fframe{
+{\bf let} $D = \{(\ol{x}_1,y_1), (\ol{x}_2,y_2),\dots,(\ol{x}_l,y_l)\} \subset \Rnspace{n} \times \{+1,-1\}$\\
+{\bf let} $C > 0$\\
+{\bf let} {\rm $\mathbf Q$ be a $l\times l$ matrix with components $Q_{ij} = y_i y_j k(\ol{x}_i,\ol{x}_j)$}\\
+{\bf let} {\rm  $\mathbf Y$ be a $1\times l$ matrix with components $Y_{1j} = y_j$}\\
+{\bf let} {\rm $\ol{q}$ be a constant vector with $q_i = 1$}\\
+{\bf let} {\rm $\ol{u}$ be a constant vector with $u_i = 0$}\\
+{\bf let} {\rm $\ol{v}$ be a constant vector with $v_i = C$}\\
+$\ol{\alpha} \leftarrow \text{solve}({\mathbf Q},\ol{q},{\mathbf Y},\ol{u},\ol{v})$\\
+$b \leftarrow \text{\rm compute using known support vectors}$\\
+{\bf return} $(\ol{\alpha},b)$
+}
+\begin{center}
+Using a quadratic programming solver to train support vector machines.
+\end{center}
+\es
+
+\bs{Quadratic Programming}
+\vspace{.2in}
+{\bf Observation:} Our kernel matrix $\mathbf Q$ is an $l\times l$ matrix on the training set $D$.
+Consider a large training set with 50,000 observations.  This would mean that the kernel
+matrix contains 2.5 billion elements, or consumes 10GB of memory if we represent each element with a 4 byte word.
+
+$\Rightarrow$ Not feasible on most of today's architectures.
+\es
+
+\bs{Chunking}
+\vspace{.2in}
+{\bf Idea:} For most data sets the ratio of support vectors to training instances is very low; we say
+that solving the dual optimization problem for SVMs gives rise to a {\em sparse solution}.
+
+The idea is then to break up the training data into {\em chunks} and search for support vectors in
+the individual chunks.
+
+If we keep the size of the chunks or {\em working sets} small then the original optimization
+problem breaks down into smaller, manageable optimization sub-problems.
+\es
+
+\bs{Chunking}
+\small
+\fframe{
+{\bf let} $D = \{(\ol{x}_1,y_1), (\ol{x}_2,y_2),\dots,(\ol{x}_l,y_l)\} \subset \Rnspace{n} \times \{+1,-1\}$\\
+{\bf let} $k > 0$\\
+$\ol{\alpha} \leftarrow \ol{0}$\\
+{\rm select a subset $W$ of size $k$ from $D$}\\
+{\bf repeat forever}\\
+\mytab {\rm solve Lagrangian dual for $W$ (update $\ol{\alpha}$ accordingly)} \\
+\mytab {\rm delete observations from $W$ that are not support vectors}\\
+\mytab $b \leftarrow \text{\rm compute using support vectors in $W$}$\\
+\mytab {\bf if} {\rm all $d\in D$ satisfy the KKT conditions } {\bf then}\\
+\mytab\mytab {\bf return} $(\ol{\alpha},b)$\\
+\mytab {\bf end if}\\
+\mytab {\rm $D_k \leftarrow$ the $k$ worst offenders in $D$  of the KKT conditions}\\
+\mytab $W \leftarrow {\color{red}W \cup D_k}$\\
+{\bf end repeat} \\
+}
+\begin{center}
+Solving the dual optimization problem using chunking.
+\end{center}
+
+\vspace{.2in}
+{\bf Observation:} $\abs{W \cup D_k} \approx k$ when the solution is sparse.
+\es
+
+\bs{Chunking}
+\small
+We are trying to find a global maximum by solving smaller sub-problems - how do we know when 
+we are done?
+
+$\Rightarrow$ We monitor the KKT conditions,
+
+\begin{align*}
+\frac{\partial L}{\partial \ol{w}}(\ol{\alpha},\ol{\beta}, \ol{w}^*,\ol{\xi},b) &= 0,\\
+\frac{\partial L}{\partial \xi_i}(\ol{\alpha},\ol{\beta},\ol{w},\xi^*_i,b) &= 0,\\
+\frac{\partial L}{\partial b}(\ol{\alpha},\ol{\beta},\ol{w},\ol{\xi},b^*) &= 0,\\
+\alpha^*_i (y_i(\ol{w}^*\bullet\ol{x}_i - b^*) + \xi^*_i -1)&= 0, \\
+\beta^*_i\xi^*_i&= 0,\\
+y_i(\ol{w}^*\bullet\ol{x}_i - b^*) + \xi^*_i -1&\ge 0, \\
+\alpha^*_i &\ge 0,\\
+\beta^*_i &\ge 0,\\
+\xi^*_i &\ge 0,
+\end{align*}
+for $i = 1,\ldots,l$.
+\es
+
+\bs{Chunking}
+\small
+A closer look reveals that we only need to monitor the complimentarity conditions,
+\begin{gather*}
+\alpha_i (y_i(\ol{w}\bullet\ol{x}_i - b) + \xi_i -1)= 0, \\
+\beta_i\xi_i = 0.
+\end{gather*}
+We can rewrite these slightly using the dual for the normal vector $\ol{w}$ and
+$\beta_i = C - \alpha_i$ as,
+\begin{gather*}
+\alpha_i\left( y_i\left ( \sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i) - b\right ) - 1 + \xi_i\right ) = 0,\\
+(C - \alpha_i)\xi_i = 0,
+\end{gather*}
+for all $(\ol{x}_i,y_i)\in D$ with $i = 1,\ldots,l$.
+
+\vspace{.2in}
+{\bf Problem:} We cannot directly monitor the slack variables $\xi_i$.  However,
+we can obtain a set of conditions implied by the complimentarity conditions using
+a case analysis on $\alpha_i$.
+\es
+
+\bs{Chunking}
+\vspace{.2in}
+Case analysis:
+\begin{description}
+\item[$\alpha_i = 0$:] This implies $\xi_i = 0$, therefore
+$ %\begin{equation*}
+y_i\left (\sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i) - b\right ) \ge 1.
+$ %\end{equation*}
+\item[$0 < \alpha_i < C$:] This implies $\xi_i = 0$, therefore
+$ %\begin{equation*}
+y_i\left (\sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i) - b\right ) = 1.
+$ %\end{equation*}
+\item[$\alpha_i = C$:] This implies $\xi_i > 0$, therefore
+$ %\begin{equation*}
+y_i\left (\sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i) - b\right ) \le 1.
+$ %\end{equation*}
+\end{description}
+\es
+
+\bs{Chunking}
+\vspace{.2in}
+Putting it all together gives us the condition:
+\begin{equation*}
+y_i\left (\sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i) - b\right ) \left \{ 
+\begin{aligned}
+\ge 1 & \text{ if $\alpha_i = 0$}\\
+= 1 & \text{ if $0 < \alpha_i < C$}\\
+\le 1 & \text{ if $\alpha_i = C$}
+\end{aligned}
+\right .
+\end{equation*}
+for all $(\ol{x}_i,y_i)\in D$ with $i = 1,\ldots,l$.
+
+{\bf Observation:} One way to view these conditions is as a {\em consistency test}: if the values of the Lagrangian multipliers
+are consistent with the locations of the corresponding training points vis-\`{a}-vis a decision surface,
+then we have found a global solution.
+
+\es
+
+\bs{SMO}
+
+SMO -- Sequential Minimal Optimization.
+
+We can view the SMO algorithm as a chunking algorithm with a working set of size 2.
+
+A working set of size 2 is the smallest working set that allows for an optimization that
+satisfies the constraints,
+\begin{equation*}
+\sum_{i=1}^l y_i \alpha_i = 0.
+\end{equation*}
+Then consider the  subproblem of our Lagrangian dual optimization using the Lagrangian multipliers $\alpha_j$
+and $\alpha_k$ (our working set),
+\begin{equation*}
+\max_{\alpha_j,\alpha_k} \phi'(\alpha_j,\alpha_k),
+\end{equation*}
+subject to the constraints,
+\begin{align*}
+y_j \alpha_j + y_k \alpha_k &= \delta,\\
+C \ge \alpha_j,\alpha_k &\ge 0,  
+\end{align*}
+with $j,k = 1, \ldots, l$ and $j\ne k$.
+
+\es
+
+
+\bs{SMO}
+We can rewrite the second to last equation on the previous slide as,
+\begin{equation*}
+\alpha_k = y_k (\delta - y_j \alpha_j).
+\end{equation*}
+It follows that,
+\begin{equation*}
+\max_{\alpha_j,\alpha_k} \phi'(\alpha_j,\alpha_k) = \max_{\alpha_j} \phi' \left (\alpha_j,y_k(\delta - y_j\alpha_j)\right) = \max_{\alpha_j} \psi(\alpha_j).
+\end{equation*}
+That is, our two-variable optimization problem becomes an optimization problem over the single variable  $\alpha_j$.  We represent the objective function of this single variable optimization problem
+as $\psi(\alpha_j)$.
+Now $\psi$ has a single maximum that we can find by,
+\begin{equation*}
+\frac{d \psi}{d \alpha_j} = 0,
+\end{equation*} 
+and solving for $\alpha_j$ and then use above
+equation to fiind $\alpha_k$.
+
+Some care needs to be taken to satisfy the constraints on $\alpha_i$ during this 
+optimization.
+\es
+
+\bs{SMO}
+\vspace{.2in}
+\fframe{
+{\bf let} $D = \{(\ol{x}_1,y_1), (\ol{x}_2,y_2),\dots,(\ol{x}_l,y_l)\} \subset \Rnspace{n} \times \{+1,-1\}$\\
+$\ol{\alpha} \leftarrow \ol{0}$\\
+{\bf repeat}\\
+\begin{minipage}{8in}\rm
+\begin{enumerate}
+\item pick two points, $\ol{x}_j$ and $\ol{x}_k$  in $D$ 
+together with their\\
+respective Lagrangian multipliers, $\alpha_j$ and $\alpha_k$, where $j \ne k$.
+\item optimize the subproblem $\max \phi'(\alpha_j,\alpha_k)$ (keeping the other Lagrangian\\
+multipliers constant).
+\item compute $b$
+\end{enumerate}
+\end{minipage}
+{\bf until} {\rm the KKT conditions hold for all $d\in D$}\\
+{\bf return} $(\ol{\alpha},b)$
+}
+\begin{center}
+Sequential Minimal Optimization.
+\end{center}
+\es
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% end of template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

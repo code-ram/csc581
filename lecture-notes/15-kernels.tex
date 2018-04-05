@@ -1,0 +1,141 @@
+%template1.tex
+%The following LaTeX source file represents the simplest kind of slide presentation; no overlays, no included graphics. Substitute your favorite style for ``pascal''. To create the PDF file template1.pdf, (1) be sure to use the prosper class, then (2) execute the command latex template1.tex, and (3) the command dvipdf template1.dvi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,blends,pdf,colorBG,slideColor]{prosper}
+\include{defs}
+\begin{document}
+
+\bs{Kernel Functions}
+\small
+If we let $k(\ol{x},\ol{y}) =\Phi(\ol{x})\bullet\Phi(\ol{y}) $ be a kernel function, then we can write
+our support vector machine in terms of kernels,
+\begin{equation*}
+\model{f}(\ol{x}) =  \sign\left (\sum_{i=1}^l \alpha^*_i y_i  {\color{red}k(\ol{x}_i,\ol{x})}  -  \sum_{i=1}^l \alpha^*_i y_i  {\color{red}k(\ol{x}_i,\ol{x}_{sv^+})} + 1\right )
+\end{equation*}
+
+We can write our training algorithm in terms of kernel functions as well,
+\begin{equation*}
+ \ol{\alpha}^* = \argmax_{\ol{\alpha}} \left ( \sum_{i=1}^l \alpha_i - 
+  \frac{1}{2}\sum_{i=1}^l \sum_{j=1}^l \alpha_i \alpha_j y_i y_j {\color{red}k(\ol{x}_i,\ol{x}_j)} \right ),
+\end{equation*}  
+subject to the constraints,
+\begin{align*}
+\sum_{i=1}^l \alpha_i  y_i &= 0,\\
+\alpha_i  &\ge 0, \quad i = 1,\ldots,l.
+\end{align*}
+Selecting the right kernel for a particular non-linear classification problem is called {\em feature search}.
+\es
+
+\bs{Kernel Functions}
+\begin{tabular*}{\textwidth}{@{\vrule height 16pt depth 4pt width 0pt \hskip\arraycolsep\extracolsep{\fill}}l l l}
+      \toprule
+Kernel Name & Kernel Function & Free Parameters \\
+      \midrule
+Linear Kernel & 
+	$k(\ol{x},\ol{y}) = \ol{x} \bullet \ol{y} $ & 
+		none \\ 
+Homogeneous Polynomial Kernel & 
+	$k(\ol{x},\ol{y}) = (\ol{x} \bullet \ol{y})^d$ & 
+		$d \geq 2$ \\ 
+Non-Homogeneous Polynomial Kernel & 
+	$k(\ol{x},\ol{y}) = (\ol{x} \bullet \ol{y} + c)^d$ & 
+		$d \geq 2$, $c > 0$ \\ 
+Gaussian Kernel & 
+	$k(\ol{x},\ol{y}) = e^{-\frac{\abs{\ol{x}-\ol{y}}^2}{2\sigma^2}}$ & 
+		$\sigma > 0$ \\ 
+      \bottomrule
+   \end{tabular*}
+\es
+
+\bs{Non-linear Classifiers}
+Let's review classification with non-linear SVMs:
+\begin{enumerate}
+\item We have a non-linear data set.
+\item Pick a kernel other than the linear kernel, this means that the input space will be transformed
+into a higher dimensional feature space.
+\item Solve our dual maximum margin problem in the feature space (we are solving now a linear 
+classification problem).
+\item The resulting model is a linear model in feature space and a {\em non-linear model} in
+input space.
+\end{enumerate}
+\es
+
+\bs{A Closer Look at Kernels}
+
+We have shown that for $\Phi(x_1,x_2) = (x_1^2,x_2^2,\sqrt{2}x_1 x_2)$ the kernel
+\begin{equation*}
+k(\ol{x},\ol{y}) = \Phi(\ol{x})\bullet\Phi(\ol{y}) = (\ol{x}\bullet\ol{y})^2.
+\end{equation*}
+That is, we picked our mapping from input space into feature space in such a way that the kernel
+in feature space can be evaluated in input space.
+
+This begs the question: What about the other kernels? What do the associated feature spaces
+and mappings look like?
+
+It turns out that for each kernel function we can construct a canonical feature space and mapping.
+This implies that features spaces and mappings for kernels are not unique!
+\es
+
+\bs{Properties of Kernels}
+\small
+\vspace{.2in}
+\fdef{[Positive Definite Kernel]
+A function $k\co \Rnspace{n} \times \Rnspace{n} \rightarrow \Real$ such that
+\begin{equation*}
+\sum_{i=1}^l\sum_{j=1}^l\theta_i \theta_j k(\ol{x}_i,\ol{x}_j) \geq 0 
+\end{equation*}
+holds is called a \ul{positive definite kernel}.
+Here, $\theta_i,\theta_j \in \Real$ and  
+$\ol{x}_1,\ldots,\ol{x}_l$ is a set of points in $\Rnspace{n}$.
+}
+\es
+
+\bs{Properties of Kernels}
+\small
+New notation:  Let $k\co \Rnspace{n} \times \Rnspace{n} \rightarrow \Real$
+be a kernel, then $k(\cdot, \ol{x})$ is a partially evaluated kernel with $\ol{x} \in \Rnspace{n}$ and
+represents a function $\Rnspace{n} \rightarrow \Real$.
+
+\vspace{.2in}
+\fframe{{\bf Theorem:} [Reproducing Kernel Property]
+\label{th:reproducible-kernel}
+Let $k\co \Rnspace{n} \times \Rnspace{n} \rightarrow \Rnspace{n}$ be a positive definite kernel, then
+the following property holds,
+\begin{equation*}
+k(\ol{x},\ol{y}) = k(\ol{x},\cdot)\bullet k(\cdot,\ol{y}),
+\end{equation*}
+with $\ol{x},\ol{y} \in \Rnspace{n}$.
+}
+\es
+
+\bs{Feature Spaces are not Unique}
+\small
+We illustrate that feature spaces are not unique using our homogeneous polynomial kernel to the power of two, that is, 
+$k(\ol{x},\ol{y})=(\ol{x}\bullet\ol{y})^2$ with $\ol{x}, \ol{y} \in \Rnspace{2}$.
+Let $\Phi\co \Rnspace{2} \rightarrow {\color{red}\Rnspace{3}}$ such that
+\begin{equation*}
+\Phi(\ol{x}) = \Phi(x_1,x_2)= ({x}_1^2,{x}_2^2,\sqrt{2} {x}_1^2 {x}_2^2)
+\end{equation*}
+and $\Psi\co \Rnspace{2} \rightarrow {\color{red}\{\Rnspace{2}\rightarrow \Real\}}$ with
+\begin{equation*}
+\Psi(\ol{x}) = k(\cdot,\ol{x}) = ((\cdot)\bullet\ol{x})^2,
+\end{equation*}
+be two mappings from our input space to two different feature spaces,
+then
+\begin{align*}
+\Phi(\ol{x})\bullet\Phi(\ol{y}) &= (\ol{x}_1^2,\ol{x}_2^2,\sqrt{2} \ol{x}_1^2 \ol{x}_2^2)\bullet
+		(\ol{y}_1^2,\ol{y}_2^2,\sqrt{2} \ol{y}_1^2 \ol{y}_2^2)\\
+		& =  (\ol{x}\bullet \ol{y})^2\\
+		&= k(\ol{x},\ol{y})\\
+		&= k(\cdot,\ol{x})\bullet k(\cdot,\ol{y})\\
+		& =  ((\cdot)\bullet\ol{x})^2 \bullet ((\cdot)\bullet\ol{y})^2\\
+		& =  \Psi(\ol{x}) \bullet \Psi(\ol{y}).
+\end{align*}
+The section on kernels in the book shows that the construction $\Psi(\ol{x}) \bullet \Psi(\ol{y})$
+is indeed well defined and represents a dot product in an appropriate feature space.
+\es
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% end of template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

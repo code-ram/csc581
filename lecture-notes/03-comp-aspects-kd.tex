@@ -1,0 +1,149 @@
+%template1.tex
+%The following LaTeX source file represents the simplest kind of slide presentation; no overlays, no included graphics. Substitute your favorite style for ``pascal''. To create the PDF file template1.pdf, (1) be sure to use the prosper class, then (2) execute the command latex template1.tex, and (3) the command dvipdf template1.dvi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,blends,pdf,colorBG,slideColor]{prosper}
+\include{defs}
+\begin{document}
+
+\bs{Computational Aspects of KD}
+\begin{itemize}
+\item Data Access 
+	\begin{itemize}
+	\item read.csv
+	\item write.csv
+	\item edit
+	\end{itemize}
+\item Visualization 
+	\begin{itemize}
+	\item scatter plots
+	\end{itemize}
+\item Data Manipulation
+	\begin{itemize}
+	\item attribute-oriented approach
+	\item observation-oriented approach
+	\end{itemize}
+\item Model Building and Evaluation
+\item Model Deployment
+\end{itemize}
+\es
+
+
+\bs{Data Manipulation}
+Recall that a data frame is a data table
+representation in R,
+\begin{Rcode}
+> mammals.df
+  Legs Wings  Fur Feathers Mammal
+1    4    no  yes       no   true
+2    2   yes   no      yes  false
+3    4    no   no       no  false
+4    4   yes  yes       no   true
+5    3    no   no       no  false
+\end{Rcode}
+\es
+
+\bs{Data Manipulation}
+{\bf Attribute-oriented Approach}
+
+We can access any attribute in the mammals data frame with the \mytt{\$} notation.
+\begin{Rcode}
+> mammals.df$Legs
+[1] 4 2 4 4 3
+> mammals.df$Mammal
+[1]  true   false  false  true   false
+Levels:  false  true
+\end{Rcode}
+
+R allows us to select groups of attributes with the \mytt{subset} function,
+\begin{Rcode}
+> subset(mammals.df, select=Fur:Mammal)
+   Fur Feathers Mammal
+1  yes       no   true
+2   no      yes  false
+3   no       no  false
+4  yes       no   true
+5   no       no  false
+> subset(mammals.df, select=-Mammal)
+  Legs Wings  Fur Feathers
+1    4    no  yes       no
+2    2   yes   no      yes
+3    4    no   no       no
+4    4   yes  yes       no
+5    3    no   no       no
+\end{Rcode}
+\es
+
+\bs{Data Manipulation}
+{\bf Observation-oriented Approach}
+
+We can use the \emph{subset} function also for observation-oriented data manipulation.
+
+\begin{Rcode}
+> subset(mammals.df, Legs == 4)
+  Legs Wings  Fur Feathers Mammal
+1    4    no  yes       no   true
+3    4    no   no       no  false
+4    4   yes  yes       no   true
+\end{Rcode}
+
+Another, slightly more complicated example,
+
+\begin{Rcode}
+> mammal.levels <- levels(mammals.df$Mammal)
+> mammal.levels
+[1] "false" "true" 
+> true.level <- mammal.levels[2]
+> subset(mammals.df, Mammal == true.level)
+  Legs Wings Fur Feathers Mammal
+1    4    no yes       no   true
+4    4   yes yes       no   true
+\end{Rcode}
+\es
+
+
+\bs{Model Building and Evaluation}
+We use the library 'e1071' (don't ask :) for building support vector machine models. \footnote{The library 
+is available through the Package Installer.}
+
+\begin{Rcode}
+> library(e1071)
+\end{Rcode}
+Now we can construct a support vector machine model of our mammals data with the \mytt{svm}
+function,
+\begin{Rcode}
+> model<-svm(Mammal ~ .,data=mammals.df,kernel="linear")
+\end{Rcode}
+
+At this point we can evaluate our model by checking how it performs on the training set.
+
+\begin{Rcode}
+> mammals.df$Mammal == fitted(model)
+[1] TRUE TRUE TRUE TRUE TRUE
+\end{Rcode}
+
+\vspace{1in}
+\es
+
+
+\bs{Model Deployment}
+Model deployment means applying your model in an appropriate context.  In R we use
+the \mytt{predict} function to compute the value of the dependent attribute for some object.
+Given that R is a programming language we could program appropriate functionality around
+the predict function.
+
+\begin{Rcode}
+> independent.df <- subset(mammals.df, select=-Mammal)
+> predict(model, independent.df)
+     1      2      3      4      5 
+  true  false  false   true  false 
+Levels:  false  true
+\end{Rcode}
+
+How could we test in R whether these predictions are correct with respect to the original
+data set \mytt{mammals.df}?
+\es
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% end of template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

@@ -1,0 +1,123 @@
+%template1.tex
+%The following LaTeX source file represents the simplest kind of slide presentation; no overlays, no included graphics. Substitute your favorite style for ``pascal''. To create the PDF file template1.pdf, (1) be sure to use the prosper class, then (2) execute the command latex template1.tex, and (3) the command dvipdf template1.dvi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,blends,pdf,colorBG,slideColor]{prosper}
+\include{defs}
+\begin{document}
+
+\bs{Gradient Ascent}
+\small
+Recall the following setting for training support vector machines.
+
+Assume that we are given the training set,
+\begin{equation*}
+D = \{(\ol{x}_1,y_1),(\ol{x}_2,y_2),\ldots,(\ol{x}_l,y_l)\} \subseteq \Rnspace{n}\times\{+1, -1\}.
+\end{equation*}
+We are interested in computing a classifier in the form of a support vector machine model,
+\begin{equation*}
+\model{f}(\ol{x}) = \sign \left ( \sum_{i=1}^l y_i \alpha^*_i k(\ol{x}_i,\ol{x}) - b^*\right ),
+\end{equation*}
+using a training algorithm based on the Lagrangian dual,
+\begin{equation*}
+\ol{\alpha}^* = {\color{red} \argmax_{\ol{\alpha}} \phi'(\ol{\alpha})} = 
+ \argmax_{\ol{\alpha}}  \left (\sum_{i=1}^l \alpha_i - 
+  \frac{1}{2}\sum_{i=1}^l\sum_{j=1}^l y_i y_j \alpha_i \alpha_j k(\ol{x}_i,\ol{x}_j) \right ),
+\end{equation*}
+subject to  the constraints,
+\begin{align*}
+\sum_{i=1}^l y_i \alpha_i &= 0, \\
+C \ge \alpha_i &\ge 0,  
+\end{align*}
+with $i=1,\ldots,l$.
+\es
+
+\bs{Gradient Ascent}
+\small
+In order to train SVMs we need to solve the optimization problem
+\begin{equation*}
+\ol{\alpha}^* = \argmax_{\ol{\alpha}} \phi'(\ol{\alpha}).
+\end{equation*}
+Perhaps the most straightforward implementation of  the Lagrangian dual optimization problem 
+is by {\em gradient ascent}.
+
+Formally, let $h$ be a differentiable function with respect to $\ol{x} \in \Rnspace{n}$, then the
+\textemph{gradient} of $h$ is defined as,
+\begin{equation*}
+\grad h = \left (\frac{\partial h}{\partial x_1},\cdots,\frac{\partial h}{\partial x_n}\right ).
+\end{equation*}
+We often write, 
+\begin{equation*}
+\grad_{\! i} h = \frac{\partial h}{\partial x_i},
+\end{equation*}
+for the $i^\text{th}$ component of $\grad h$ with $i = 1,\ldots, n$.
+
+Now, $\grad h(\ol{y})$ with $\ol{y}\in \Rnspace{n}$ is a vector that points in the direction of the largest
+increase of $h$ at point $\ol{y}$.
+
+We can use this to find the maximum of our dual $\phi'$ by simply following the gradient until the 
+gradient becomes zero $\Rightarrow$ gradient ascent.
+\es
+
+\bs{Gradient Ascent}
+\vspace{.2in}
+\fframe{
+{\bf let} $\eta \in[ 0,1]$\\
+$\ol{\alpha}\leftarrow \ol{0}$\\
+{\bf repeat}\\
+\mytab $\ol{\alpha}_{\text{old}} \leftarrow \ol{\alpha}$\\
+\mytab {\bf for} $i = 1 \text{ \bf to } l$ {\bf do}\\
+\mytab\mytab $\alpha_i \leftarrow \alpha_i + \eta \grad_{\! i} \phi'(\ol{\alpha})$\\
+\mytab {\bf end for}\\
+{\bf until} $\ol{\alpha} - \ol{\alpha}_{\text{old}} \approx \ol{0}$\\
+{\bf return} $\ol{\alpha}$
+}
+\begin{center}
+The gradient ascent algorithm.
+\end{center}
+\es
+
+\bs{Gradient Ascent}
+{\bf Observation:} We have treated our optimization problem as an unconstrained optimization
+problem ignoring the constraints,
+\begin{align*}
+\sum_{i=1}^l y_i \alpha_i &= 0, \\
+C \ge \alpha_i &\ge 0,  
+\end{align*}
+with $i=1,\ldots,l$.
+The first constraint is due to the optimization of the offset term $b$ and the second constraint
+is the soft-margin constraint for the Lagrangian multipliers.
+
+We can dispense with the first constraint by simply setting $b=0$.
+
+The second constraint is easily implemented as a set of {\em box constraints} on $\ol{\alpha}$,
+\begin{equation*}
+\alpha_i \leftarrow \min\left\{C,\max\left\{0,\alpha_i + \eta\grad_{\! i} \phi'(\ol{\alpha})\right\}\right\}.
+\end{equation*}
+
+\es
+
+\bs{The Kernel-Adatron}
+\vspace{.2in}
+\fframe{
+{\bf let} $D = \{(\ol{x}_1,y_1), (\ol{x}_2,y_2),\dots,(\ol{x}_l,y_l)\} \subset \Rnspace{n} \times \{+1,-1\}$\\
+{\bf let} $\eta > 0$\\
+{\bf let} $C > 0$\\
+{\bf let} $b = 0$\\
+$\ol{\alpha} \leftarrow \ol{0}$\\
+{\bf repeat}\\
+\mytab $\ol{\alpha}_{\text{\rm old}} \leftarrow \ol{\alpha}$\\
+\mytab {\bf for} $i = 1$ {\bf to} $l$ {\bf do}\\
+\mytab\mytab$ \alpha_i \leftarrow \min\left \{C,\max\left\{0,\alpha_i + \eta-\eta y_i \sum_{j=1}^l y_j \alpha_j k(\ol{x}_j,\ol{x}_i)\right\}\right\}$ \\
+\mytab {\bf end for}\\
+{\bf until} $\ol{\alpha} - \ol{\alpha}_{\text{\rm old}} \approx \ol{0}$\\
+{\bf return} $(\ol{\alpha},b)$
+}
+\begin{center}
+The Kernel-Adatron algorithm.
+\end{center}
+\es
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% end of template1.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
