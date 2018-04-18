@@ -35,6 +35,7 @@ Graduate Machine Learning Course at the University of Rhode Island
 <a href="lecture-notes/34-regression-ann.pdf">ANNs for Regression</a><br>
 <a href="lecture-notes/35-regression-trees.pdf">Regression Trees</a><br>
 <a href="lecture-notes/36-deep-learning.pdf">Deep Learning</a><br>
+<a href="lecture-notes/37-unsupervise-learning.pdf">Unsupervised Learning</a><br>
 
 <!--
 <a href="lecture-notes/26-alternatives.pdf">Alternative Formulations of SVMs</a> <br>
